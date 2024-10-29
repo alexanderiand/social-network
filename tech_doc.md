@@ -457,3 +457,7 @@ This project will help you learn about:
   is_group_event_for_mems bool [not null, default: false]
   event_id varchar
 }`
+
+
+
+some change

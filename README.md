@@ -32,6 +32,8 @@ Table sessions as S {
   created_at datatime [not null, default: 'now']
 }
 
+
+
 // ### Profile Service
 
 // Users Profiles
