@@ -1,0 +1,10 @@
+service: 
+  name: "SocialNetwork-NorthVoid"
+  version: "0.0.0"
+
+http_server:
+  idle_timeout: 60
+  write_timeout: 30
+  read_timeout: 30
+  max_header_mb: 20
+
