@@ -1,0 +1,63 @@
+version: "3"
+
+services:
+  social_network_platform:
+    restart: always 
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: social_network_platform
+    env_file: .env
+    ports:
+    - ${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT} 
+    networks:
+    - social_network_net
+    depends_on: 
+    - postgresql
+    - mongodb
+    - redis
+    - rebbitmq
+
+  postgresql:
+    restart: always
+    container_name: postgresql
+    image: posrgres:14
+    env_file: .env
+    environment: 
+    - ${POSTGRES_USER}
+    - ${POSTGRES_PASSWORD}
+    ports:
+    - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    volumes:
+    - ./databases/postgresql/data:/var/lib/postgresql/data
+    networks:
+    - social_network_net
+
+  mongodb:
+    restart: always
+    image: mongo:concret_version_some or latest
+    container_name: mongodb
+    ports:
+    - ${MONGODB_PORT}:${MONGODB_PORT}
+    env_file: .env
+    environment:
+    - ${MONGO_INITDB_ROOT_USERNAME}
+    - ${MONGO_INITDB_ROOT_PASSWORD}
+    volumes: 
+    - ./databases/mongodb/data:/var/lib/docker/mongodb/_data
+    networks:
+    - social_networks
+
+  rabbitmq:
+    restart: always
+    image: rabbitmq:managment
+    container_name: rabbitmq
+    ports:
+    - ${REBBITMQ_PORT}:${REBBITMQ_PORT}
+    env_file: .env
+    environment:
+    - ${REBBITMQ_DEFAULT_USER}
+    - ${REBBITMQ_DEFUALT_PASS}
+
+networks:
+  social_network_net:

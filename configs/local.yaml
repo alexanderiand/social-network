@@ -1,10 +1,12 @@
+env: "local" # local, dev, prod 
+
 service: 
   name: "SocialNetwork-NorthVoid"
-  version: "0.0.0"
+  version: "0.1.3"
 
 http_server:
-  idle_timeout: 60
-  write_timeout: 30
-  read_timeout: 30
+  idle_timeout: 60s
+  write_timeout: 30s
+  read_timeout: 30s
   max_header_mb: 20
 

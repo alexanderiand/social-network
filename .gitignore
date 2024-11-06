@@ -1,4 +1,5 @@
 .vscode
 tech_docs
 .env
-*TheoryAboutDevelopment
+.social_network_gophers_database_design.md
+.social_network_services.md
