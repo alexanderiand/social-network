@@ -194,3 +194,133 @@ Table events as Ev {
   is_group_event_for_mems bool [not null, default: false]
   event_id varchar
 }
+
+---
+
+## Services
+
+### SSO (Auth) Service:
+
+#### Requirments
+  1. Requirments: (Это то что сервис должен уметь вообще)
+    - Registration (Identification) - Sign-up
+    - Authentification - Sign-in - Token - JWT Token
+    - Logout, Sign-out
+    - Authorization - roles
+
+    - Provide user information, 
+    - Also provide information about use profile
+    
+  2. Technical realization: (Это то что нужно заказчику, технические требования)
+    - Sessions
+    - Cookies - Full State Service
+
+    -- State less - don't storage any data about user or other entities into itself
+    - JWT Bearer Authentification 
+
+
+### Content Service
+  
+#### Requirments
+  1. Requirments:
+
+
+
+--- Project strucutes
+
+- SSO Service
+- Content Service
+- Chat Service
+- Comunication Service
+- Event Service | Notify Service
+
+
+- Monolita <- Microservices
+
+Image backend - 1
+
+
+
+Image frontend - 1
+
+
+
+### Back-end
+- docs
+- cmd
+  - social network
+    - main.go
+  
+- pkg
+  - config
+    config.go
+
+  - sso_service
+    config
+      config.go
+      local.yaml
+    main.go
+  - content_service
+    main.go
+  - ...
+
+////////////////////////////////////// Our choice 
+  clean architecture 
+  internal
+    - app
+    - trasport_common (controllers) -> request (message, command, event)
+      - http
+        - rest
+      - amqp
+      - websocket
+      - grpc
+      - cli 
+
+    - sso_service
+      - usecase
+      - entity
+    - content_service
+      - usecase
+      - entity
+    - chat_service
+      - usecase
+      - entity
+
+    - infrastructure (gateway, repository) - data
+      - repo
+        - storage
+          - postgresql
+          - mongodb
+          - redis
+      - webapi
+        - services apis
+        - content_service
+  pkg
+    - config
+    - logger
+    ...
+//////////////////////////////////////
+
+  clean arch + DDD
+  internal
+    - sso_service
+      - app
+      - transport
+        - net interfaces
+      - usecase
+      - infras
+        - repo
+        - webapi
+        -.....
+    - content_serice
+      - app
+      - transport
+        - net interfaces
+      - usecase
+      - infras
+        - repo
+        - webapi
+        -.....
+
+
+

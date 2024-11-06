@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"time"
 
@@ -26,10 +27,14 @@ const (
 	mongoURLEnv = "MONGO_URL"
 )
 
-var ErrFilePathNotExists = errors.New("error, file path not exists")
+var (
+	ErrFilePathNotExists = errors.New("error, file path not exists")
+	ErrEnvNotExists      = errors.New("error, env not exists")
+)
 
 type (
 	Config struct {
+		Env         string `yaml:"env"`
 		*Service    `yaml:"service"`
 		*HTTPServer `yaml:"http_server"`
 		*Cache
@@ -68,6 +73,7 @@ type (
 // InitConfig Initialization config for project
 func InitConfig() (*Config, error) {
 	cfgFilePath, ok := os.LookupEnv(cfgFilePathEnv)
+	fmt.Printf("Path to config: %v\n\n\n", cfgFilePath)
 	if !ok {
 		return nil, ErrFilePathNotExists
 	}
@@ -76,7 +82,11 @@ func InitConfig() (*Config, error) {
 		return nil, err
 	}
 
-	Config := &Config{}
+	Config := &Config{
+		Cache:    &Cache{},
+		Database: &Database{},
+	}
+
 	if err := cleanenv.ReadConfig(cfgFilePath, Config); err != nil {
 		return nil, err
 	}
