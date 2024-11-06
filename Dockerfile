@@ -1,4 +1,4 @@
-FROM golang:1.23.4                 
+FROM golang
 # base image for creatign our a new image
 
 # всё оке

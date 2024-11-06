@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   social_network_platform:
@@ -16,12 +16,12 @@ services:
     - postgresql
     - mongodb
     - redis
-    - rebbitmq
+    - rabbitmq
 
   postgresql:
     restart: always
     container_name: postgresql
-    image: posrgres:14
+    image: postgres
     env_file: .env
     environment: 
     - ${POSTGRES_USER}
@@ -35,7 +35,7 @@ services:
 
   mongodb:
     restart: always
-    image: mongo:concret_version_some or latest
+    image: mongo
     container_name: mongodb
     ports:
     - ${MONGODB_PORT}:${MONGODB_PORT}
@@ -46,18 +46,30 @@ services:
     volumes: 
     - ./databases/mongodb/data:/var/lib/docker/mongodb/_data
     networks:
-    - social_networks
+    - social_network_net
 
   rabbitmq:
     restart: always
-    image: rabbitmq:managment
+    image: rabbitmq
     container_name: rabbitmq
     ports:
-    - ${REBBITMQ_PORT}:${REBBITMQ_PORT}
+    - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
     env_file: .env
     environment:
-    - ${REBBITMQ_DEFAULT_USER}
-    - ${REBBITMQ_DEFUALT_PASS}
+    - ${RABBITMQ_DEFAULT_USER}
+    - ${RABBITMQ_DEFAULT_PASS}
+    networks:
+      - social_network_net
+
+  redis:
+    restart: always
+    image: redis
+    container_name: redis
+    env_file: .env
+    ports:
+      - ${REDIS_URL}:${REDIS_URL}
+    networks:
+      - social_network_net
 
 networks:
   social_network_net:
