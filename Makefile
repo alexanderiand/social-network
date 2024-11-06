@@ -24,10 +24,10 @@ race: test
 run: race 
 	go run cmd/social-network/main.go 
 
-echo:
-	echo MAKEFILE ECHO ${POSTGRES_USER}-postgres user
+dc_create_network:
+	docker network create social_network_net
 
-dc_up: echo
+dc_up:
 	docker compose up -d
 
 # default 
