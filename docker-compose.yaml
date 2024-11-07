@@ -29,7 +29,7 @@ services:
     ports:
     - ${POSTGRES_PORT}:${POSTGRES_PORT}
     volumes:
-    - ./databases/postgresql/data:/var/lib/postgresql/data
+    - ${POSTGRES_VOLUME_PATH}:/var/lib/postgresql/data
     networks:
     - social_network_net
 
@@ -38,15 +38,25 @@ services:
     image: mongo
     container_name: mongodb
     ports:
-    - ${MONGODB_PORT}:${MONGODB_PORT}
+    - ${MONGO_PORT}:${MONGO_PORT}
     env_file: .env
     environment:
     - ${MONGO_INITDB_ROOT_USERNAME}
     - ${MONGO_INITDB_ROOT_PASSWORD}
     volumes: 
-    - ./databases/mongodb/data:/var/lib/docker/mongodb/_data
+    - ${MONGO_VOLUME_PATH}:/var/lib/docker/mongodb/_data
     networks:
     - social_network_net
+
+  redis:
+    restart: always
+    image: redis
+    container_name: redis
+    env_file: .env
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    networks:
+      - social_network_net
 
   rabbitmq:
     restart: always
@@ -58,16 +68,6 @@ services:
     environment:
     - ${RABBITMQ_DEFAULT_USER}
     - ${RABBITMQ_DEFAULT_PASS}
-    networks:
-      - social_network_net
-
-  redis:
-    restart: always
-    image: redis
-    container_name: redis
-    env_file: .env
-    ports:
-      - ${REDIS_URL}:${REDIS_URL}
     networks:
       - social_network_net
 
