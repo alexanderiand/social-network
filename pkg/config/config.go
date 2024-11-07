@@ -34,7 +34,7 @@ var (
 
 type (
 	Config struct {
-		Env         string `yaml:"env"`
+		Env        string `yaml:"env"`
 		Service    `yaml:"service"`
 		HTTPServer `yaml:"http_server"`
 		Cache
@@ -46,13 +46,13 @@ type (
 		Version string `yaml:"version"`
 	}
 
-	HTTPServer struct { 
-		Host          string        `env:"HTTP_SERVER_HOST" env-require:"true"`
-		Port          string        `env:"HTTP_SERVER_PORT" env-require:"true"`
-		IdleTimeout   time.Duration `yaml:"idle_timeout"`
+	HTTPServer struct {
+		Host         string        `env:"HTTP_SERVER_HOST" env-require:"true"`
+		Port         string        `env:"HTTP_SERVER_PORT" env-require:"true"`
+		IdleTimeout  time.Duration `yaml:"idle_timeout"`
 		WriteTimeout time.Duration `yaml:"write_timeout"`
-		ReadTimeout   time.Duration `yaml:"read_timeout"`
-		MaxMB         int           `yaml:"max_header_mb"`
+		ReadTimeout  time.Duration `yaml:"read_timeout"`
+		MaxMB        int           `yaml:"max_header_mb"`
 	}
 
 	Cache struct {

@@ -31,4 +31,4 @@ dc_up:
 	docker compose up -d
 
 # default 
-.DEFAULT_GOAL := dc_up
+.DEFAULT_GOAL := run

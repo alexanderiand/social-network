@@ -9,7 +9,7 @@ WORKDIR /app
 
 # install third party libs
 COPY go.mod go.sum ./
-# RUN go mod download
+RUN go mod download
 
 # # update packages and install postgresql-client for working with pg
 # RUN apt-get update
