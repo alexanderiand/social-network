@@ -4,15 +4,23 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	pgxpool "github.com/jackc/pgx/v5/pgxpool"
 
 	"social-network/pkg/config"
 )
 
+// consts
+const (
+	_attempts = 3
+	_delay    = time.Second * 3
+)
+
 // Postgres errors
 var (
-	ErrNilStructPointer = errors.New("error, nil struct pointer")
+	ErrNilStructPointer   = errors.New("error, nil struct pointer")
+	ErrCannotConnectToPgs = errors.New("error, 0 connection attempts left: the database is't connected")
 )
 
 // DBTX
@@ -46,11 +54,33 @@ func New(ctx context.Context, cfg *config.Config) (*Postgres, error) {
 	)
 
 	postgres := Postgres{}
-	db, err := pgxpool.New(ctx, dsn)
+	err := doWithTries(func() error {
+		db, err := pgxpool.New(ctx, dsn)
+		if err != nil {
+			return err
+		}
+
+		postgres.Pool = db
+
+		return nil
+	}, _attempts, _delay)
+
 	if err != nil {
 		return nil, err
 	}
-	postgres.Pool = db
 
 	return &postgres, nil
+}
+
+// doWithTries
+func doWithTries(fn func() error, attempts int, delay time.Duration) error {
+	for attempts > 0 {
+		if err := fn(); err != nil {
+			time.Sleep(delay)
+			attempts--
+			continue
+		}
+		return nil
+	}
+	return ErrCannotConnectToPgs
 }
