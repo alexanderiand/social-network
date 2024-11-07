@@ -57,7 +57,8 @@ type (
 	}
 
 	Cache struct {
-		URL string `env:"REDIS_URL"` // Here we can write URL or host && port
+		Host string `env:"REDIS_HOST"`
+		Port string `env:"REDIS_PORT"`
 	}
 
 	Database struct {

@@ -7,6 +7,7 @@ import (
 
 	"social-network/internal/infrastructure/repository/storage/mongodb"
 	"social-network/internal/infrastructure/repository/storage/postgresql"
+	"social-network/internal/infrastructure/repository/storage/redis"
 	"social-network/pkg/config"
 )
 
@@ -46,6 +47,19 @@ func Run(ctx context.Context, cfg *config.Config) error {
 		return err // TODO: call platform.Stop
 	}
 	slog.Info("Successful connected to the MongoDB")
+
+	// TODO: InitRedis
+	redis, err := redis.New(ctx, cfg)
+	if err != nil {
+		slog.Error(err.Error())
+		return err // TODO: call platform.Stop
+	}
+	slog.Debug("Created a new client instance of the Redis")
+
+	if res := redis.Ping(); res.Err() != nil {
+		return res.Err() // TODO: call platform.Stop
+	}
+	slog.Info("Successful connected to the Redis cache server")
 
 	// TODO: InitRabbitMQ
 
