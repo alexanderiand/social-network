@@ -22,6 +22,7 @@ require (
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.18.1 // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
+	github.com/streadway/amqp v1.1.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect

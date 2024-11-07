@@ -40,6 +40,7 @@ type (
 		Cache
 		Database
 		Mongo
+		MessageBroker
 	}
 
 	Service struct {
@@ -75,6 +76,13 @@ type (
 		Port     string `env:"MONGO_PORT"`
 		Username string `env:"MONGO_INITDB_ROOT_USERNAME"`
 		Password string `env:"MONGO_INITDB_ROOT_PASSWORD"`
+	}
+
+	MessageBroker struct {
+		Host     string `env:"RABBITMQ_HOST"`
+		Port     string `env:"RABBITMQ_PORT"`
+		Username string `env:"RABBITMQ_DEFAULT_USER"`
+		Password string `env:"RABBITMQ_DEFAULT_PASS"`
 	}
 )
 

@@ -64,6 +64,7 @@ services:
     container_name: rabbitmq
     ports:
     - ${RABBITMQ_PORT}:${RABBITMQ_PORT}
+    - ${RABBITMQ_MANAGMENT_PORT}:${RABBITMQ_MANAGMENT_PORT}
     env_file: .env
     environment:
     - ${RABBITMQ_DEFAULT_USER}

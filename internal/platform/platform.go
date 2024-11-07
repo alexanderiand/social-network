@@ -5,8 +5,11 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/streadway/amqp"
+
 	"social-network/internal/infrastructure/repository/storage/mongodb"
 	"social-network/internal/infrastructure/repository/storage/postgresql"
+	"social-network/internal/infrastructure/repository/storage/rabbitmq"
 	"social-network/internal/infrastructure/repository/storage/redis"
 	"social-network/pkg/config"
 )
@@ -33,8 +36,9 @@ func Run(ctx context.Context, cfg *config.Config) error {
 		return err // TODO: call platform.Stop
 	}
 	slog.Info("Successful connected to the PostgreSQL")
+	defer postgres.Close()
 
-	// TODO: InitMongoDB
+	// InitMongoDB
 	mongo, err := mongodb.New(ctx, cfg)
 	if err != nil {
 		slog.Error(err.Error())
@@ -47,8 +51,9 @@ func Run(ctx context.Context, cfg *config.Config) error {
 		return err // TODO: call platform.Stop
 	}
 	slog.Info("Successful connected to the MongoDB")
+	defer mongo.Disconnect(ctx)
 
-	// TODO: InitRedis
+	// InitRedis
 	redis, err := redis.New(ctx, cfg)
 	if err != nil {
 		slog.Error(err.Error())
@@ -60,8 +65,24 @@ func Run(ctx context.Context, cfg *config.Config) error {
 		return res.Err() // TODO: call platform.Stop
 	}
 	slog.Info("Successful connected to the Redis cache server")
+	defer redis.Close()
 
-	// TODO: InitRabbitMQ
+	// InitRabbitMQ
+	rabbit, err := rabbitmq.New(ctx, cfg)
+	if err != nil {
+		slog.Error(err.Error())
+		return err // TODO: call platform.Stop
+	}
+	slog.Debug("Created a new connection with the RabbitMQ message broker")
+
+	mbErrChan := make(chan *amqp.Error)
+	notifyMBErr := rabbit.NotifyClose(mbErrChan)
+	if err := <-notifyMBErr; err != nil { // TODO: use for \ select \ case for listening errChan
+		slog.Error(err.Error())
+		return err // TODO: call platform.Stop
+	}
+	slog.Info("Successful connected to the RabbitMQ Message Broker")
+	defer rabbit.Close()
 
 	//! every microservices implement into itself Dependency Inversion, use Dependency Injection
 
