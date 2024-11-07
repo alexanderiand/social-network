@@ -35,10 +35,10 @@ var (
 type (
 	Config struct {
 		Env         string `yaml:"env"`
-		*Service    `yaml:"service"`
-		*HTTPServer `yaml:"http_server"`
-		*Cache
-		*Database
+		Service    `yaml:"service"`
+		HTTPServer `yaml:"http_server"`
+		Cache
+		Database
 	}
 
 	Service struct {
@@ -46,12 +46,12 @@ type (
 		Version string `yaml:"version"`
 	}
 
-	HTTPServer struct { // host, port - это обычно хранится в переменных окружения, если это ком.разработка. стракт-тэг env-require:"true"` требует обязательно значение в env file
+	HTTPServer struct { 
 		Host          string        `env:"HTTP_SERVER_HOST" env-require:"true"`
 		Port          string        `env:"HTTP_SERVER_PORT" env-require:"true"`
-		Idletimeout   time.Duration `yaml:"idle_timeout"`
-		Writretimeout time.Duration `yaml:"write_timeout"`
-		Readtimeout   time.Duration `yaml:"read_timeout"`
+		IdleTimeout   time.Duration `yaml:"idle_timeout"`
+		WriteTimeout time.Duration `yaml:"write_timeout"`
+		ReadTimeout   time.Duration `yaml:"read_timeout"`
 		MaxMB         int           `yaml:"max_header_mb"`
 	}
 
@@ -82,10 +82,7 @@ func InitConfig() (*Config, error) {
 		return nil, err
 	}
 
-	Config := &Config{
-		Cache:    &Cache{},
-		Database: &Database{},
-	}
+	Config := &Config{}
 
 	if err := cleanenv.ReadConfig(cfgFilePath, Config); err != nil {
 		return nil, err
