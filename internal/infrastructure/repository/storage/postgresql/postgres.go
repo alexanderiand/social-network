@@ -28,6 +28,8 @@ type DBTX interface {
 	// TODO: Database Methods
 }
 
+// TODO: add migrations
+
 // Postgres is a abs to the PostgreSQL DB
 type Postgres struct {
 	DBTX
@@ -71,6 +73,8 @@ func New(ctx context.Context, cfg *config.Config) (*Postgres, error) {
 
 	return &postgres, nil
 }
+
+// TODO: RunMigration
 
 // doWithTries
 func doWithTries(fn func() error, attempts int, delay time.Duration) error {

@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 
+	"social-network/internal/infrastructure/repository/storage/mongodb"
 	"social-network/internal/infrastructure/repository/storage/postgresql"
 	"social-network/pkg/config"
 )
@@ -18,20 +19,33 @@ import (
 // If going unknown error, return this unknown error
 func Run(ctx context.Context, cfg *config.Config) error {
 	// init databases, message brokers
-	// TODO: InitPostgreSQL
+	// InitPostgreSQL
 	postgres, err := postgresql.New(ctx, cfg)
 	if err != nil {
+		slog.Error(err.Error())
 		return err // TODO: call platform.Stop
 	}
+	slog.Debug("Created a new PostgreSQL client")
 
 	if err := postgres.Ping(ctx); err != nil {
+		slog.Error(err.Error())
 		return err // TODO: call platform.Stop
 	}
 	slog.Info("Successful connected to the PostgreSQL")
 
 	// TODO: InitMongoDB
+	mongo, err := mongodb.New(ctx, cfg)
+	if err != nil {
+		slog.Error(err.Error())
+		return err // TODO: call platform.Stop
+	}
+	slog.Debug("Created a new MongoDB client")
 
-	// TODO: InitRedis
+	if err := mongo.Ping(ctx, nil); err != nil {
+		slog.Error(err.Error())
+		return err // TODO: call platform.Stop
+	}
+	slog.Info("Successful connected to the MongoDB")
 
 	// TODO: InitRabbitMQ
 

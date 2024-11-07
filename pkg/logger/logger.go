@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log/slog"
 	"os"
+
 	"social-network/pkg/config"
 )
 
@@ -39,7 +40,8 @@ func InitLogger(cfg *config.Config) (log *slog.Logger, err error) {
 func newCustomLogger(level string) (logger *slog.Logger) {
 	if level == "local" {
 		logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
+			Level:     slog.LevelDebug,
+			AddSource: true, // TODO: Hardcode param
 		}))
 
 		slog.SetDefault(logger)

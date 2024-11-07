@@ -39,6 +39,7 @@ type (
 		HTTPServer `yaml:"http_server"`
 		Cache
 		Database
+		Mongo
 	}
 
 	Service struct {
@@ -66,7 +67,13 @@ type (
 		Password string `env:"POSTGRES_PASSWORD"`
 		DBname   string `env:"POSTGRES_DBNAME"`
 		SSLMode  string `env:"POSTGRES_SSLMODE"`
-		MongoURL string `env:"MONGO_URL"`
+	}
+
+	Mongo struct {
+		Host     string `env:"MONGO_HOST"`
+		Port     string `env:"MONGO_PORT"`
+		Username string `env:"MONGO_INITDB_ROOT_USERNAME"`
+		Password string `env:"MONGO_INITDB_ROOT_PASSWORD"`
 	}
 )
 
