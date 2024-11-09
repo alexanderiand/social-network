@@ -4,14 +4,21 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/streadway/amqp"
 
 	"social-network/pkg/config"
 )
 
+const (
+	_attempts = 3
+	_delay    = 3 * time.Second
+)
+
 var (
-	ErrNilStructPointer = errors.New("error, nil struct pointer")
+	ErrNilStructPointer           = errors.New("error, nil struct pointer")
+	ErrCannotConnectionToRabbitMQ = errors.New("error, can't connected to the RabbitMq")
 )
 
 // MBTX - MessageBroker TX
@@ -37,13 +44,34 @@ func New(ctx context.Context, cfg *config.Config) (*RabbitMQ, error) {
 		cfg.MessageBroker.Host,
 		cfg.MessageBroker.Port,
 	) // TODO: fix this, change user, pass place
-	conn, err := amqp.Dial(dsn)
+
+	err := doWithTries(func() error {
+		conn, err := amqp.Dial(dsn)
+		if err != nil {
+			return err
+		}
+		rmb.Connection = conn
+
+		return nil
+	}, _attempts, _delay)
+
 	if err != nil {
 		return nil, err
 	}
-	rmb.Connection = conn
 
 	return rmb, nil
 }
 
 // TODO: doWithTries
+func doWithTries(fn func() error, attempts int, delay time.Duration) error {
+	for attempts > 0 {
+		if err := fn(); err != nil {
+			attempts--
+			time.Sleep(delay)
+			continue
+		}
+		return nil
+	}
+
+	return ErrCannotConnectionToRabbitMQ
+}

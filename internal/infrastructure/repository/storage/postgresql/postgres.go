@@ -13,7 +13,7 @@ import (
 	"social-network/pkg/config"
 )
 
-// consts
+// const
 const (
 	_attempts = 3
 	_delay    = time.Second * 3
