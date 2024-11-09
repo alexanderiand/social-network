@@ -11,6 +11,7 @@ import (
 	"github.com/pressly/goose"
 
 	"social-network/pkg/config"
+	"social-network/pkg/utils"
 )
 
 // const
@@ -25,27 +26,24 @@ var (
 	ErrCannotConnectToPgs = errors.New("error, 0 connection attempts left: the database is't connected")
 )
 
-// DBTX
-type DBTX interface {
-	// TODO: Database Methods
-}
-
-// TODO: add migrations
-
 // Postgres is a abs to the PostgreSQL DB
 type Postgres struct {
-	DBTX
+	DBEngine // postgresql/interface.go
 	*pgxpool.Pool
 }
 
 // New is Postgres constructor, return a new
 // instance of the Postgres
-func New(ctx context.Context, cfg *config.Config) (*Postgres, error) {
+func New() *Postgres {
+	return &Postgres{}
+}
+
+// Connection to the PostgreSQL, use pgxpool, return *pgxpool.Pool inside *Postgres
+// If cfg is nil, return ErrNilStructPointer
+func (p *Postgres) Connection(ctx context.Context, cfg *config.Config) (*Postgres, error) {
 	if cfg == nil {
 		return nil, ErrNilStructPointer
 	}
-
-	// DoWithTries
 
 	// DSN
 	dsn := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=%s",
@@ -57,14 +55,13 @@ func New(ctx context.Context, cfg *config.Config) (*Postgres, error) {
 		cfg.Database.SSLMode,
 	)
 
-	postgres := Postgres{}
-	err := doWithTries(func() error {
+	err := utils.DoWithTries(func() error {
 		db, err := pgxpool.New(ctx, dsn)
 		if err != nil {
 			return err
 		}
 
-		postgres.Pool = db
+		p.Pool = db
 
 		return nil
 	}, _attempts, _delay)
@@ -73,22 +70,7 @@ func New(ctx context.Context, cfg *config.Config) (*Postgres, error) {
 		return nil, err
 	}
 
-	return &postgres, nil
-}
-
-// TODO: RunMigration
-
-// doWithTries
-func doWithTries(fn func() error, attempts int, delay time.Duration) error {
-	for attempts > 0 {
-		if err := fn(); err != nil {
-			time.Sleep(delay)
-			attempts--
-			continue
-		}
-		return nil
-	}
-	return ErrCannotConnectToPgs
+	return p, nil
 }
 
 // RunMigration use the goose libs, set postgres dialect, and run migrations

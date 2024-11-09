@@ -9,6 +9,7 @@ import (
 	"github.com/streadway/amqp"
 
 	"social-network/pkg/config"
+	"social-network/pkg/utils"
 )
 
 const (
@@ -43,9 +44,9 @@ func New(ctx context.Context, cfg *config.Config) (*RabbitMQ, error) {
 		cfg.MessageBroker.Password,
 		cfg.MessageBroker.Host,
 		cfg.MessageBroker.Port,
-	) // TODO: fix this, change user, pass place
+	)
 
-	err := doWithTries(func() error {
+	err := utils.DoWithTries(func() error {
 		conn, err := amqp.Dial(dsn)
 		if err != nil {
 			return err
@@ -60,18 +61,4 @@ func New(ctx context.Context, cfg *config.Config) (*RabbitMQ, error) {
 	}
 
 	return rmb, nil
-}
-
-// TODO: doWithTries
-func doWithTries(fn func() error, attempts int, delay time.Duration) error {
-	for attempts > 0 {
-		if err := fn(); err != nil {
-			attempts--
-			time.Sleep(delay)
-			continue
-		}
-		return nil
-	}
-
-	return ErrCannotConnectionToRabbitMQ
 }

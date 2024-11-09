@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"social-network/pkg/config"
+	"social-network/pkg/utils"
 )
 
 // const
@@ -23,11 +24,6 @@ var (
 	ErrNilStructPointer     = errors.New("error, nil struct pointer")
 	ErrCannotConnectToMongo = errors.New("error, cannot connect to the MongoDB")
 )
-
-// DBTX
-type DBTX interface {
-	// TODO: methods for MongoDB
-}
 
 // MongoDB is a MongoDB client
 type MongoDB struct {
@@ -51,7 +47,7 @@ func New(ctx context.Context, cfg *config.Config) (*MongoDB, error) {
 	clientOps := options.Client().ApplyURI(dsn)
 	db := &MongoDB{}
 
-	err := doWithTries(func() error {
+	err := utils.DoWithTries(func() error {
 		mongodb, err := mongo.Connect(ctx, clientOps)
 		if err != nil {
 			return err
@@ -66,19 +62,4 @@ func New(ctx context.Context, cfg *config.Config) (*MongoDB, error) {
 	}
 
 	return db, nil
-}
-
-// doWithTries tries to connect the MongoDB equal attempts, with delay interval with tries
-// If can't connect to the MongoDB, return ErrCannotConnectToMongoDB
-func doWithTries(fn func() error, attempts int, delay time.Duration) error {
-	for attempts > 0 {
-		if err := fn(); err != nil {
-			time.Sleep(delay)
-			attempts--
-			continue
-		}
-		return nil
-	}
-
-	return ErrCannotConnectToMongo
 }

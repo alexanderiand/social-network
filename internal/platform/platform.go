@@ -6,11 +6,11 @@ import (
 	"log/slog"
 	"os"
 
-	"social-network/internal/infrastructure/repository/storage/mongodb"
-	"social-network/internal/infrastructure/repository/storage/postgresql"
-	"social-network/internal/infrastructure/repository/storage/rabbitmq"
-	"social-network/internal/infrastructure/repository/storage/redis"
 	"social-network/pkg/config"
+	"social-network/pkg/infras/cache/redis"
+	"social-network/pkg/infras/message_broker/rabbitmq"
+	"social-network/pkg/infras/storage/mongodb"
+	"social-network/pkg/infras/storage/postgresql"
 )
 
 var (
@@ -87,7 +87,7 @@ func InitInfrastructures(ctx context.Context, cfg *config.Config) (*Infras, erro
 	infra := &Infras{}
 
 	// InitPostgreSQL
-	postgres, err := postgresql.New(ctx, cfg)
+	postgres, err := postgresql.New().Connection(ctx, cfg)
 	if err != nil {
 		slog.Error(err.Error())
 		return nil, err // TODO: call platform.Stop
