@@ -7,6 +7,8 @@ import (
 	"time"
 
 	pgxpool "github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5/stdlib"
+	"github.com/pressly/goose"
 
 	"social-network/pkg/config"
 )
@@ -87,4 +89,20 @@ func doWithTries(fn func() error, attempts int, delay time.Duration) error {
 		return nil
 	}
 	return ErrCannotConnectToPgs
+}
+
+// RunMigration use the goose libs, set postgres dialect, and run migrations
+// If when set dialect happened error, return this error
+// If when running migration occurred error, return this error
+func (p *Postgres) RunMigration(path string) error {
+	if err := goose.SetDialect("postgres"); err != nil {
+		return err
+	}
+
+	db := stdlib.OpenDBFromPool(p.Pool)
+	if err := goose.Up(db, path); err != nil {
+		return err
+	}
+
+	return nil
 }

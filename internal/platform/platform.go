@@ -36,6 +36,12 @@ func Run(ctx context.Context, cfg *config.Config) error {
 		return err // TODO: call platform.Stop
 	}
 	slog.Info("Successful connected to the PostgreSQL")
+
+	if err := postgres.RunMigration(cfg.MigrationFilesPath); err != nil {
+		slog.Error(err.Error())
+		return err // TODO: call platform.Stop
+	}
+	slog.Info("Successful completed migrations via goose")
 	defer postgres.Close()
 
 	// InitMongoDB

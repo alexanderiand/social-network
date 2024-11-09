@@ -30,7 +30,7 @@ func main() {
 
 	// TODO: run platform
 	if err := platform.Run(ctx, cfg); err != nil {
-		slog.Error(err.Error())
+		// slog.Error(err.Error())
 		slog.Info("Parent context canceled!")
 		cancel()
 	}

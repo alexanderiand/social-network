@@ -1,6 +1,6 @@
 .SILENT:
 
-.PHONY: fmt lint test race run dc_up
+.PHONY: fmt lint test race run dc_up dc_create_network dc_down
 
 include .env 
 export 
@@ -29,6 +29,9 @@ dc_create_network:
 
 dc_up:
 	docker compose up -d
+
+dc_down:
+	docker compose down
 
 # default 
 .DEFAULT_GOAL := run

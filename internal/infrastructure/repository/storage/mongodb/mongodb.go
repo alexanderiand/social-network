@@ -73,6 +73,7 @@ func New(ctx context.Context, cfg *config.Config) (*MongoDB, error) {
 func doWithTries(fn func() error, attempts int, delay time.Duration) error {
 	for attempts > 0 {
 		if err := fn(); err != nil {
+			time.Sleep(delay)
 			attempts--
 			continue
 		}

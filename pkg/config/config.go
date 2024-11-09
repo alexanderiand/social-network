@@ -41,6 +41,7 @@ type (
 		Database
 		Mongo
 		MessageBroker
+		MigrationFilesPath string `env:"MIGRATION_FILES_PATH"`
 	}
 
 	Service struct {

@@ -21,6 +21,8 @@ require (
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/onsi/ginkgo v1.16.5 // indirect
 	github.com/onsi/gomega v1.18.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
+	github.com/pressly/goose v2.7.0+incompatible // indirect
 	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/streadway/amqp v1.1.0 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
