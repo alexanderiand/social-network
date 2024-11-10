@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"social-network/internal/platform"
+	"social-network/internal/platform/infras"
 	"social-network/pkg/config"
 	"social-network/pkg/logger"
 )
@@ -40,7 +41,7 @@ func main() {
 	wg := &sync.WaitGroup{}
 
 	// initInfrastructure
-	infra, err := platform.InitInfrastructures(ctx, cfg)
+	infra, err := infras.InitInfrastructures(ctx, cfg)
 	if err != nil {
 		slog.Error(err.Error())
 		return
@@ -65,7 +66,7 @@ func main() {
 	wg.Wait()
 
 	// close infras services connections
-	if err := platform.CloseConnections(ctx, infra); err != nil {
+	if err := infras.CloseConnections(ctx, infra); err != nil {
 		slog.Error(err.Error())
 	}
 	slog.Info("Closed the Infrastructure services connections")
