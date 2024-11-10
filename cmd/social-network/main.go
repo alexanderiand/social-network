@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"log"
 	"log/slog"
+	"sync"
 
 	"social-network/internal/platform"
 	"social-network/pkg/config"
 	"social-network/pkg/logger"
 )
+
+// _srtCount total service count, need for implementing shuting down platform
+const _srvCount = 1
 
 func main() {
 	cfg, err := config.InitConfig()
@@ -28,12 +32,27 @@ func main() {
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 
-	// TODO: run platform
-	if err := platform.Run(ctx, cfg); err != nil {
+	// platform.Stop args
+	dieChan := make(chan struct{}, _srvCount)
+	crtErrChan := make(chan error, 1)
+	wg := &sync.WaitGroup{}
+
+	// run platform
+	go platform.Run(ctx, cfg, crtErrChan, dieChan)
+
+	// stop platform
+	wg.Add(1)
+	go platform.Stop(ctx, cfg, crtErrChan, dieChan, wg, _srvCount)
+
+	// if receive critical error, cancel parent context
+	if err := <-crtErrChan; err != nil {
 		slog.Error(err.Error())
-		slog.Info("Parent context canceled!")
 		cancel()
 	}
 
-	// TODO: stop platform
+	// waiting goroutines
+
+	wg.Wait()
+
+	slog.Info("Bye! The Platform successful stopped!")
 }

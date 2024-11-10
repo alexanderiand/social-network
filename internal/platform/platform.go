@@ -3,8 +3,12 @@ package platform
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"os"
+	"os/signal"
+	"sync"
+	"syscall"
 
 	ssoapp "social-network/internal/sso_service/app"
 	"social-network/pkg/config"
@@ -24,17 +28,22 @@ var (
 // If error accrued while initializing the databases new instance, return ErrDBInit*(postgres or other db error)
 // If error happened while implement DI, return more specific Err*(layer init error)
 // If going unknown error, return this unknown error
-func Run(ctx context.Context, cfg *config.Config) error {
+func Run(
+	ctx context.Context,
+	cfg *config.Config,
+	crtErrChan chan error,
+	dieChan chan struct{},
+) {
+
 	// init databases, cache, and message brokers
 	infra, err := InitInfrastructures(ctx, cfg)
 	if err != nil {
-		return err
+		crtErrChan <- err
+		return
 	}
 	slog.Info("Infrastructures successful initialized")
 
 	_ = infra
-
-	dieChan := make(chan struct{}, 6) // for stopping all service in one time
 
 	//! every microservices implement into itself Dependency Inversion, use Dependency Injection
 
@@ -43,7 +52,9 @@ func Run(ctx context.Context, cfg *config.Config) error {
 
 	// ssosrv.Run
 	if err := ssoapp.Run(ctx, cfg, dieChan); err != nil {
-		return err
+		// call platform.Stop
+		crtErrChan <- err
+		return
 	}
 
 	// TODO: contentsrv.Run
@@ -52,27 +63,62 @@ func Run(ctx context.Context, cfg *config.Config) error {
 
 	// TODO: comsrv.Run
 
-	return nil
 }
 
-// TODO: Stop (graceful shutdown) platform with all sub-services (micro-services)
 // Stop called if context canceled, receive os.Signal, or critical error, or invalid config params
 // Stop implement Graceful Shutdown for the Platform, also for every sub services of the Platform
 // If ctx, sigChan, or crtErrChan is invalid, return Err*(above arg name)
 // If the databases closing with error, return this specific error as a wrapped error with more info
 // If the message broker, RabbitMQ return error in closing, return this error as a wrapped error with more error
 // if another going wrong with unknown error, return this error as the wrapped error, with additional information
-func Stop(ctx context.Context, cfg *config.Config, sigChan <-chan os.Signal, critErrChan <-chan error) error {
+func Stop(
+	ctx context.Context,
+	cfg *config.Config,
+	critErrChan chan error,
+	dieChan chan struct{},
+	wg *sync.WaitGroup,
+	srvCount int,
+) {
 	// receive context canceling, os signal or critical error, start graceful shutdown the Platform
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
 
-	// start closing transport layer connection (http, websocket, grpc, amqp)
+loop:
+	for {
+		select {
+		case <-ctx.Done():
+			slog.Error("Parent context canceled! Starting shutdown the platform")
+			break loop
+		case err := <-critErrChan:
+			if err != nil {
+				critErrInfo := "Critical error: "
+				slog.Error(fmt.Errorf("%s %w", critErrInfo, err).Error())
+				critErrChan <- err
+				break loop
+			}
+			continue
+		case sig := <-sigChan:
+			info := fmt.Sprintf(
+				"Receive the os.Signal: %s, starting shuting down the platform",
+				sig.String())
+			slog.Error(info)
+			break loop
+		}
+	}
 
-	// send to the every microservices signal about starting graceful shutdown process
+	// starting shutdown the platform
+	genDieSignal(srvCount, dieChan)
 
-	// waiting closing this services
+	wg.Done()
+}
 
-	// close the all databases and message broker
-	return nil
+// genDieSignal
+func genDieSignal(srvCount int, dieChan chan struct{}) {
+	for srvCount > 0 {
+		dieChan <- struct{}{}
+		srvCount--
+	}
+	close(dieChan)
 }
 
 // Infras

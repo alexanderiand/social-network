@@ -18,7 +18,7 @@ import (
 
 // errors
 var (
-	ErrCritical = errors.New("error, critical error ")
+	ErrCritical = errors.New("error, critical error")
 )
 
 // Run
@@ -64,7 +64,7 @@ func Run(ctx context.Context, gcfg *gconfig.Config, dieChan <-chan struct{}) err
 	router.Init(ctx)
 	slog.Info("Successful Initialized SSO Service router")
 
-	// http sever
+	// create a new http sever instance
 	httpServer := server.New(ctx, gcfg, lcfg, router)
 
 	// information about service running
@@ -74,8 +74,10 @@ func Run(ctx context.Context, gcfg *gconfig.Config, dieChan <-chan struct{}) err
 		lcfg.Host,
 		lcfg.Port,
 	)
-
 	slog.Info(info)
+
+	// run the http server into separate goroutine for non blocking
+	// the main service goroutine
 	go func() {
 		if err := httpServer.Start(ctx); err != nil {
 			slog.Error(err.Error())
@@ -86,9 +88,8 @@ func Run(ctx context.Context, gcfg *gconfig.Config, dieChan <-chan struct{}) err
 
 	// graceful shutdown
 	// stop the server
-	// close db connection
 	<-dieChan // when receive from the dieChan msg, starting shutdown service
-	slog.Info("Start shuting down SSO Service")
+	slog.Info("Shuting down SSO Service")
 	defer func(ctx context.Context) {
 		if err := httpServer.Shutdown(ctx); err != nil {
 			slog.Error(err.Error())
@@ -97,8 +98,9 @@ func Run(ctx context.Context, gcfg *gconfig.Config, dieChan <-chan struct{}) err
 	}(ctx)
 	slog.Debug("Close the SSO Service http server")
 
+	// close db connection
 	defer postgres.Close()
 	slog.Debug("Close the SSO Server database connection")
 
-	return nil
+	return ErrCritical
 }
