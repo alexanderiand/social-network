@@ -33,5 +33,17 @@ dc_up:
 dc_down:
 	docker compose down
 
+proto_install:
+	apt update && apt install -y protobuf-compiler \
+	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest \
+	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest \
+	protoc --version
+
+proto_gen:
+	protoc -I ./proto --go_out=. --go_opt paths=source_relative \
+	--go-grpc_out=. --go-grpc_opt=paths=source_relative \
+	--grpc-gateway_out=. --grpc-gateway_opt=paths=source_relative \
+	./proto/sso_service.proto
+
 # default 
 .DEFAULT_GOAL := run

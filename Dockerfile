@@ -11,15 +11,12 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# # update packages and install postgresql-client for working with pg
-# RUN apt-get update
-# RUN apt-get install -y postgresql-client
-
 COPY . .
 
 EXPOSE 8080:8080
 
-RUN go build -o social_network ./cmd/social-network/main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \ 
+    go build -o social_network ./cmd/social-network/main.go
 
 FROM alpine
 
