@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"social-network/pkg/config"
 	"social-network/pkg/infras/cache/redis"
@@ -12,6 +13,9 @@ import (
 	"social-network/pkg/infras/storage/mongodb"
 	"social-network/pkg/infras/storage/postgresql"
 )
+
+// waiting n second before starting closing connections
+const _waiting = time.Second * 3
 
 var (
 	ErrNilStructPointer = errors.New("error, nil struct pointer")
@@ -118,6 +122,7 @@ func CloseConnections(ctx context.Context, infra *Infras) error {
 	if infra == nil {
 		return fmt.Errorf("%s %w", fn, ErrNilStructPointer)
 	}
+	time.Sleep(_waiting) // waiting n second before start closing conns
 
 	// close the PostgreSQL connection
 	infra.PostgreSQL.Close()

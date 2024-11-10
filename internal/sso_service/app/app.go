@@ -27,14 +27,16 @@ func Run(
 	gcfg *gconfig.Config,
 	infra *infras.Infras,
 	dieChan <-chan struct{},
-) error {
+	crtErrChan chan<- error,
+) {
 	// init local configuration
 	lcfg, err := config.InitSSOSRVConfig()
 	if err != nil {
-		return err
+		crtErrChan <- err
 	}
 
 	// TODO: RabbitMQ Consumer, and Producer
+	// TODO: Redis, cache aside strategy, with the T-LRU alg of the caching
 
 	// implement Dependency Inversion use Dependency Injection
 	repo := repository.New(infra.PostgreSQL)
@@ -63,7 +65,6 @@ func Run(
 	go func() {
 		if err := httpServer.Start(ctx); err != nil {
 			slog.Error(err.Error())
-			// return
 			// handler error different way
 		}
 	}()
@@ -80,5 +81,5 @@ func Run(
 	}(ctx)
 	slog.Debug("Close the SSO Service http server")
 
-	return ErrCritical
+	crtErrChan <- ErrCritical
 }

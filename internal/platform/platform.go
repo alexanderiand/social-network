@@ -35,21 +35,20 @@ func Run(
 
 	//! every microservices implement into itself Dependency Inversion, use Dependency Injection
 
+	//! run every service on a separate goroutine, for non blocking main platform thread
 	// srv - service
 	// TODO: eventsrv.Run
 
 	// ssosrv.Run
-	if err := ssoapp.Run(ctx, cfg, infra, dieChan); err != nil {
-		// call platform.Stop
-		crtErrChan <- err
-		return
-	}
+	go ssoapp.Run(ctx, cfg, infra, dieChan, crtErrChan)
 
 	// TODO: contentsrv.Run
 
 	// TODO: chatsrv.Run
 
 	// TODO: comsrv.Run
+
+	slog.Info("exiting from the platform...")
 }
 
 // Stop called if context canceled, receive os.Signal, or critical error, or invalid config params
