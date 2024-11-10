@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"social-network/internal/platform/infras"
 	"social-network/internal/sso_service/app/config"
 	"social-network/internal/sso_service/infrastructure/repository"
 	"social-network/internal/sso_service/transport/http/rest/controller"
@@ -13,7 +14,6 @@ import (
 	"social-network/internal/sso_service/transport/http/rest/server"
 	"social-network/internal/sso_service/usecase"
 	gconfig "social-network/pkg/config"
-	"social-network/pkg/infras/storage/postgresql"
 )
 
 // errors
@@ -22,40 +22,22 @@ var (
 )
 
 // Run
-func Run(ctx context.Context, gcfg *gconfig.Config, dieChan <-chan struct{}) error {
+func Run(
+	ctx context.Context,
+	gcfg *gconfig.Config,
+	infra *infras.Infras,
+	dieChan <-chan struct{},
+) error {
 	// init local configuration
 	lcfg, err := config.InitSSOSRVConfig()
 	if err != nil {
 		return err
 	}
 
-	// InitPostgreSQL
-	postgres, err := postgresql.New().Connection(ctx, gcfg)
-	if err != nil {
-		slog.Error(err.Error())
-		return err
-	}
-	slog.Debug("Created a new PostgreSQL client")
-
-	// Check the PostgreSQL connection
-	if err := postgres.Ping(ctx); err != nil {
-		slog.Error(err.Error())
-		return err
-	}
-	slog.Info("Successful connected to the PostgreSQL")
-
-	// Run Migration via goose cli utils & lib
-	if err := postgres.RunMigration(gcfg.MigrationFilesPath); err != nil {
-		slog.Error(err.Error())
-		return err
-	}
-	slog.Info("Successful completed migrations via goose")
-	defer postgres.Close()
-
 	// TODO: RabbitMQ Consumer, and Producer
 
 	// implement Dependency Inversion use Dependency Injection
-	repo := repository.New(postgres)
+	repo := repository.New(infra.PostgreSQL)
 	usecase := usecase.New(repo)
 	controller := controller.New(usecase)
 
@@ -97,10 +79,6 @@ func Run(ctx context.Context, gcfg *gconfig.Config, dieChan <-chan struct{}) err
 		}
 	}(ctx)
 	slog.Debug("Close the SSO Service http server")
-
-	// close db connection
-	defer postgres.Close()
-	slog.Debug("Close the SSO Server database connection")
 
 	return ErrCritical
 }

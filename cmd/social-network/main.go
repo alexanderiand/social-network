@@ -34,11 +34,21 @@ func main() {
 
 	// platform.Stop args
 	dieChan := make(chan struct{}, _srvCount)
-	crtErrChan := make(chan error, 1)
+	crtErrChan := make(chan error, 2)
+	defer close(crtErrChan)
+	defer close(dieChan)
 	wg := &sync.WaitGroup{}
 
+	// initInfrastructure
+	infra, err := platform.InitInfrastructures(ctx, cfg)
+	if err != nil {
+		slog.Error(err.Error())
+		return
+	}
+	slog.Info("Infrastructures successful initialized")
+
 	// run platform
-	go platform.Run(ctx, cfg, crtErrChan, dieChan)
+	go platform.Run(ctx, cfg, infra, crtErrChan, dieChan)
 
 	// stop platform
 	wg.Add(1)
@@ -53,6 +63,12 @@ func main() {
 	// waiting goroutines
 
 	wg.Wait()
+
+	// close infras services connections
+	if err := platform.CloseConnections(ctx, infra); err != nil {
+		slog.Error(err.Error())
+	}
+	slog.Info("Closed the Infrastructure services connections")
 
 	slog.Info("Bye! The Platform successful stopped!")
 }

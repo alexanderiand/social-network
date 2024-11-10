@@ -10,6 +10,7 @@ import (
 	"sync"
 	"syscall"
 
+	"social-network/internal/platform/infras"
 	ssoapp "social-network/internal/sso_service/app"
 	"social-network/pkg/config"
 	"social-network/pkg/infras/cache/redis"
@@ -31,19 +32,10 @@ var (
 func Run(
 	ctx context.Context,
 	cfg *config.Config,
+	infra *infras.Infras,
 	crtErrChan chan error,
 	dieChan chan struct{},
 ) {
-
-	// init databases, cache, and message brokers
-	infra, err := InitInfrastructures(ctx, cfg)
-	if err != nil {
-		crtErrChan <- err
-		return
-	}
-	slog.Info("Infrastructures successful initialized")
-
-	_ = infra
 
 	//! every microservices implement into itself Dependency Inversion, use Dependency Injection
 
@@ -51,7 +43,7 @@ func Run(
 	// TODO: eventsrv.Run
 
 	// ssosrv.Run
-	if err := ssoapp.Run(ctx, cfg, dieChan); err != nil {
+	if err := ssoapp.Run(ctx, cfg, infra, dieChan); err != nil {
 		// call platform.Stop
 		crtErrChan <- err
 		return
@@ -62,7 +54,6 @@ func Run(
 	// TODO: chatsrv.Run
 
 	// TODO: comsrv.Run
-
 }
 
 // Stop called if context canceled, receive os.Signal, or critical error, or invalid config params
@@ -118,74 +109,65 @@ func genDieSignal(srvCount int, dieChan chan struct{}) {
 		dieChan <- struct{}{}
 		srvCount--
 	}
-	close(dieChan)
-}
-
-// Infras
-type Infras struct {
-	PostgreSQL *postgresql.Postgres
-	MongoDB    *mongodb.MongoDB
-	Redis      *redis.Redis
-	RabbitMQ   *rabbitmq.RabbitMQ
 }
 
 // InitInfrastructures create the new clients and the new connections
 // with databases and message brokers, return *Infras, and nil as error, if ok
 // If ctx or cfg is nil, return ErrNilStructPointer
-func InitInfrastructures(ctx context.Context, cfg *config.Config) (*Infras, error) {
+func InitInfrastructures(ctx context.Context, cfg *config.Config) (*infras.Infras, error) {
 	if ctx == nil || cfg == nil {
 		return nil, ErrNilStructPointer
 	}
-	infra := &Infras{}
+	infra := &infras.Infras{}
 
-	// // InitPostgreSQL
-	// postgres, err := postgresql.New().Connection(ctx, cfg)
-	// if err != nil {
-	// 	slog.Error(err.Error())
-	// 	return nil, err // TODO: call platform.Stop
-	// }
-	// slog.Debug("Created a new PostgreSQL client")
+	// InitPostgreSQL
+	postgres, err := postgresql.New().Connection(ctx, cfg)
+	if err != nil {
+		slog.Error(err.Error())
+		return nil, err
+	}
+	slog.Debug("Created a new PostgreSQL client")
 
-	// if err := postgres.Ping(ctx); err != nil {
-	// 	slog.Error(err.Error())
-	// 	return nil, err // TODO: call platform.Stop
-	// }
-	// slog.Info("Successful connected to the PostgreSQL")
+	// Check the PostgreSQL connection
+	if err := postgres.Ping(ctx); err != nil {
+		slog.Error(err.Error())
+		return nil, err
+	}
+	slog.Info("Successful connected to the PostgreSQL")
 
-	// if err := postgres.RunMigration(cfg.MigrationFilesPath); err != nil {
-	// 	slog.Error(err.Error())
-	// 	return nil, err // TODO: call platform.Stop
-	// }
-	// slog.Info("Successful completed migrations via goose")
-	// defer postgres.Close()
-	// infra.PostgreSQL = postgres
+	// Run Migration via goose cli utils & lib
+	if err := postgres.RunMigration(cfg.MigrationFilesPath); err != nil {
+		slog.Error(err.Error())
+		return nil, err
+	}
+	slog.Info("Successful completed migrations via goose")
+	infra.PostgreSQL = postgres
 
 	// InitMongoDB
 	mongo, err := mongodb.New(ctx, cfg)
 	if err != nil {
 		slog.Error(err.Error())
-		return nil, err // TODO: call platform.Stop
+		return nil, err
 	}
 	slog.Debug("Created a new MongoDB client")
 
 	if err := mongo.Ping(ctx, nil); err != nil {
 		slog.Error(err.Error())
-		return nil, err // TODO: call platform.Stop
+		return nil, err
 	}
 	slog.Info("Successful connected to the MongoDB")
-	defer mongo.Disconnect(ctx)
 	infra.MongoDB = mongo
 
 	// InitRedis
 	redis, err := redis.New(ctx, cfg)
 	if err != nil {
 		slog.Error(err.Error())
-		return nil, err // TODO: call platform.Stop
+		return nil, err
 	}
 	slog.Debug("Created a new client instance of the Redis")
 
 	if res := redis.Ping(); res.Err() != nil {
-		return nil, res.Err() // TODO: call platform.Stop
+		return nil, res.Err()
 	}
 	slog.Info("Successful connected to the Redis cache server")
 	defer redis.Close()
@@ -195,7 +177,7 @@ func InitInfrastructures(ctx context.Context, cfg *config.Config) (*Infras, erro
 	rabbit, err := rabbitmq.New(ctx, cfg)
 	if err != nil {
 		slog.Error(err.Error())
-		return nil, err // TODO: call platform.Stop
+		return nil, err
 	}
 	slog.Debug("Created a new connection with the RabbitMQ message broker")
 	defer rabbit.Close()
@@ -214,4 +196,36 @@ func InitInfrastructures(ctx context.Context, cfg *config.Config) (*Infras, erro
 	slog.Info("Successful connected to the RabbitMQ Message Broker")
 
 	return infra, nil
+}
+
+// CloseConnections
+func CloseConnections(ctx context.Context, infra *infras.Infras) error {
+	fn := "platform.CloseConnections"
+	if infra == nil {
+		return fmt.Errorf("%s %w", fn, ErrNilStructPointer)
+	}
+
+	// close the PostgreSQL connection
+	infra.PostgreSQL.Close()
+	slog.Debug("Close the PostgreSQL database connection")
+
+	// close the MongoDB connection
+	if err := infra.MongoDB.Disconnect(ctx); err != nil {
+		return err
+	}
+	slog.Debug("Close the MongoDB connection")
+
+	// close the Redis connection
+	if err := infra.Redis.Close(); err != nil {
+		return err
+	}
+	slog.Debug("Close the Redis connection")
+
+	// Close the RabbitMQ connection
+	if err := infra.RabbitMQ.Close(); err != nil {
+		return err
+	}
+	slog.Debug("Close the RabbitMQ connection")
+
+	return nil
 }
