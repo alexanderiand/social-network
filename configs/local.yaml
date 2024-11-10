@@ -10,3 +10,9 @@ http_server:
   read_timeout: 30s
   max_header_mb: 20
 
+internal_services:
+  sso_service:
+    name: sso_service
+    version: "0.1.3"
+    http_port: "8081"
+    # grpc_port:

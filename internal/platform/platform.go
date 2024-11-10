@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"os"
 
+	ssoapp "social-network/internal/sso_service/app"
 	"social-network/pkg/config"
 	"social-network/pkg/infras/cache/redis"
 	"social-network/pkg/infras/message_broker/rabbitmq"
@@ -33,12 +34,17 @@ func Run(ctx context.Context, cfg *config.Config) error {
 
 	_ = infra
 
+	dieChan := make(chan struct{}, 6) // for stopping all service in one time
+
 	//! every microservices implement into itself Dependency Inversion, use Dependency Injection
 
 	// srv - service
 	// TODO: eventsrv.Run
 
-	// TODO: ssosrv.Run
+	// ssosrv.Run
+	if err := ssoapp.Run(ctx, cfg, dieChan); err != nil {
+		return err
+	}
 
 	// TODO: contentsrv.Run
 
@@ -86,27 +92,27 @@ func InitInfrastructures(ctx context.Context, cfg *config.Config) (*Infras, erro
 	}
 	infra := &Infras{}
 
-	// InitPostgreSQL
-	postgres, err := postgresql.New().Connection(ctx, cfg)
-	if err != nil {
-		slog.Error(err.Error())
-		return nil, err // TODO: call platform.Stop
-	}
-	slog.Debug("Created a new PostgreSQL client")
+	// // InitPostgreSQL
+	// postgres, err := postgresql.New().Connection(ctx, cfg)
+	// if err != nil {
+	// 	slog.Error(err.Error())
+	// 	return nil, err // TODO: call platform.Stop
+	// }
+	// slog.Debug("Created a new PostgreSQL client")
 
-	if err := postgres.Ping(ctx); err != nil {
-		slog.Error(err.Error())
-		return nil, err // TODO: call platform.Stop
-	}
-	slog.Info("Successful connected to the PostgreSQL")
+	// if err := postgres.Ping(ctx); err != nil {
+	// 	slog.Error(err.Error())
+	// 	return nil, err // TODO: call platform.Stop
+	// }
+	// slog.Info("Successful connected to the PostgreSQL")
 
-	if err := postgres.RunMigration(cfg.MigrationFilesPath); err != nil {
-		slog.Error(err.Error())
-		return nil, err // TODO: call platform.Stop
-	}
-	slog.Info("Successful completed migrations via goose")
-	defer postgres.Close()
-	infra.PostgreSQL = postgres
+	// if err := postgres.RunMigration(cfg.MigrationFilesPath); err != nil {
+	// 	slog.Error(err.Error())
+	// 	return nil, err // TODO: call platform.Stop
+	// }
+	// slog.Info("Successful completed migrations via goose")
+	// defer postgres.Close()
+	// infra.PostgreSQL = postgres
 
 	// InitMongoDB
 	mongo, err := mongodb.New(ctx, cfg)

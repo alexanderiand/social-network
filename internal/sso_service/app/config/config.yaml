@@ -1,0 +1,7 @@
+service:
+  name: "sso-service"
+  version: "0.1.3"
+
+# http:
+#   host: 'localhost'
+#   port: 8081 # it's not sage way
