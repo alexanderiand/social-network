@@ -39,11 +39,11 @@ proto_install:
 	go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest \
 	protoc --version
 
-proto_gen:
-	protoc -I ./proto --go_out=. --go_opt paths=source_relative \
-	--go-grpc_out=. --go-grpc_opt=paths=source_relative \
-	--grpc-gateway_out=. --grpc-gateway_opt=paths=source_relative \
-	./proto/sso_service.proto
+proto_gen_sso:
+	protoc -I ./protos/proto --go_out=./protos/gen/sso/sso_auth --go_opt=paths=source_relative \
+	--go-grpc_out=./protos/gen/sso/sso_auth --go-grpc_opt=paths=source_relative \
+	--grpc-gateway_out=./protos/gen/sso/sso_auth --grpc-gateway_opt=paths=source_relative \
+	./protos/proto/sso_service/sso_auth.proto
 
 # default 
 .DEFAULT_GOAL := run

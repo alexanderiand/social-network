@@ -1,0 +1,101 @@
+syntax="proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/api/annotations.proto";
+
+
+package social_network.proto.sso.auth;
+
+option go_package = "social-network/protos/gen";
+
+
+// SignUp 
+// SignIn 
+// SignOut
+// RefreshToken 
+
+service SSOAuthService {
+    rpc SignUp(stream SignUpRequest) returns (SignUpResponse) {
+        // option for api gateway
+        option (google.api.http) = {
+            post: "/v1/api/auth/sign-up"
+            body: "*"
+        };
+    }
+
+    rpc SignIn(SignInRequest) returns (SignInResponse) {
+        option (google.api.http) = {
+            post: "/v1/api/auth/sign-in"
+            body: "*"
+        };
+    }
+
+    rpc SignOut(SignOutRequest) returns (SignOutResponse) {
+        option (google.api.http) = {
+            get: "/v1/api/auth/sign-out"
+        };
+    }
+
+    rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse) {
+        option (google.api.http) = {
+            post: "/v1/api/auth/refresh-token"
+            body: "*"
+        };
+    }
+}
+
+// SignUp 
+message SignUpRequest {
+    string FirstName = 1;
+    string LastName = 2;
+    google.protobuf.Timestamp DataOfBrith = 3;
+    string Email = 4;
+    bytes Avatar = 5;
+    optional string FileType = 6;
+    optional string NickName = 7;
+    optional string AboutMe = 8;
+    string Password = 9;
+}
+
+message SignUpResponse {
+    int64 StatusCode = 1;
+    string StatusText = 2;
+    string JWTAccessToken = 3;
+    string JWTRefreshToken = 4;
+}
+
+// SignIn
+message SignInRequest {
+    string Email = 1;
+    optional string NickNma = 2;
+    string Password = 3;
+    string AuthToken = 4;
+}
+
+message SignInResponse {
+    int64 StatusCode = 1;
+    string StatusText = 2;
+    string JWTAccessToken = 3;
+    string JWTRefreshToken = 4;
+}
+
+// SignOut
+message SignOutRequest {
+    int64 UserID = 1;
+}
+
+message SignOutResponse {
+    int64 StatusCode = 1;
+    string StatusText = 2;
+}
+
+// RefreshToken
+message RefreshTokenRequest {
+    int64 UserID = 1;
+    string JWTRefreshToken = 2;
+}
+
+message RefreshTokenResponse {
+    optional int64 UserID = 1;
+    string JWTAccessToken = 2;
+}
