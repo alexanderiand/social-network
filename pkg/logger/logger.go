@@ -39,7 +39,8 @@ func InitLogger(cfg *config.Config) (log *slog.Logger, err error) {
 func newCustomLogger(level string) (logger *slog.Logger) {
 	if level == "local" {
 		logger = slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelDebug,
+			Level:     slog.LevelDebug,
+			AddSource: true,
 		}))
 
 		slog.SetDefault(logger)
@@ -47,7 +48,8 @@ func newCustomLogger(level string) (logger *slog.Logger) {
 
 	if level == "dev" {
 		logger = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
+			Level:     slog.LevelInfo,
+			AddSource: true,
 		}))
 
 		slog.SetDefault(logger)
@@ -55,7 +57,8 @@ func newCustomLogger(level string) (logger *slog.Logger) {
 
 	if level == "prod" {
 		logger = slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-			Level: slog.LevelInfo,
+			Level:     slog.LevelInfo,
+			AddSource: true,
 		}))
 
 		slog.SetDefault(logger)
