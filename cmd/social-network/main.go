@@ -18,8 +18,8 @@ func main() {
 		log.Fatal("Failed to init config\n", err)
 	}
 	log.Printf("Successful project initialization Service name:%v, Service version:%v", cfg.Service.Name, cfg.Service.Version)
-
-	// init logger
+	
+	// init logger  
 	if _, err := logger.InitLogger(cfg); err != nil {
 		log.Fatal("Failed to init logger\n", cfg)
 	}
