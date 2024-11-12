@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -22,15 +23,24 @@ type (
 	Config struct {
 		Service `yaml:"service"`
 		HTTP
+		GRPC
 	}
 	Service struct {
-		Name    string `yaml:"name"`
-		Version string `yaml:"version"`
+		Name            string        `yaml:"name"`
+		Version         string        `yaml:"version"`
+		AccessTokenTTL  time.Duration `yaml:"access_token_ttl"`
+		RefreshTokenTTL time.Duration `yaml:"refresh_token_ttl"`
+		SecretSignature string        `env:"SECRET_SIGNATURE" env-required:"true"`
 	}
 
 	HTTP struct {
 		Host string `env:"SSOSRV_HTTP_HOST" env-required:"true"`
 		Port string `env:"SSOSRV_HTTP_PORT" env-required:"true"`
+	}
+
+	GRPC struct {
+		Host string `env:"SSOSRV_GRPC_HOST" env-required:"true"`
+		Port string `env:"SSOSRV_GRPC_PORT" env-required:"true"`
 	}
 )
 

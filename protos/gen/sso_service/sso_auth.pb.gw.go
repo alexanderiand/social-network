@@ -2,11 +2,11 @@
 // source: sso_service/sso_auth.proto
 
 /*
-Package gen is a reverse proxy.
+Package ssoauthpb is a reverse proxy.
 
 It translates gRPC into RESTful JSON APIs.
 */
-package gen
+package ssoauthpb
 
 import (
 	"context"
@@ -185,7 +185,7 @@ func RegisterSSOAuthServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/social_network.proto.sso.auth.SSOAuthService/SignIn", runtime.WithHTTPPathPattern("/v1/api/auth/sign-in"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/social_network.proto.sso.auth.v1.SSOAuthService/SignIn", runtime.WithHTTPPathPattern("/v1/api/auth/sign-in"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -210,7 +210,7 @@ func RegisterSSOAuthServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/social_network.proto.sso.auth.SSOAuthService/SignOut", runtime.WithHTTPPathPattern("/v1/api/auth/sign-out"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/social_network.proto.sso.auth.v1.SSOAuthService/SignOut", runtime.WithHTTPPathPattern("/v1/api/auth/sign-out"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -235,7 +235,7 @@ func RegisterSSOAuthServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/social_network.proto.sso.auth.SSOAuthService/RefreshToken", runtime.WithHTTPPathPattern("/v1/api/auth/refresh-token"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/social_network.proto.sso.auth.v1.SSOAuthService/RefreshToken", runtime.WithHTTPPathPattern("/v1/api/auth/refresh-token"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -299,7 +299,7 @@ func RegisterSSOAuthServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.SSOAuthService/SignUp", runtime.WithHTTPPathPattern("/v1/api/auth/sign-up"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.v1.SSOAuthService/SignUp", runtime.WithHTTPPathPattern("/v1/api/auth/sign-up"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -321,7 +321,7 @@ func RegisterSSOAuthServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.SSOAuthService/SignIn", runtime.WithHTTPPathPattern("/v1/api/auth/sign-in"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.v1.SSOAuthService/SignIn", runtime.WithHTTPPathPattern("/v1/api/auth/sign-in"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -343,7 +343,7 @@ func RegisterSSOAuthServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.SSOAuthService/SignOut", runtime.WithHTTPPathPattern("/v1/api/auth/sign-out"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.v1.SSOAuthService/SignOut", runtime.WithHTTPPathPattern("/v1/api/auth/sign-out"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -365,7 +365,7 @@ func RegisterSSOAuthServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.SSOAuthService/RefreshToken", runtime.WithHTTPPathPattern("/v1/api/auth/refresh-token"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/social_network.proto.sso.auth.v1.SSOAuthService/RefreshToken", runtime.WithHTTPPathPattern("/v1/api/auth/refresh-token"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return

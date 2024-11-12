@@ -40,9 +40,9 @@ proto_install:
 	protoc --version
 
 proto_gen_sso:
-	protoc -I ./protos/proto --go_out=./protos/gen/sso/sso_auth --go_opt=paths=source_relative \
-	--go-grpc_out=./protos/gen/sso/sso_auth --go-grpc_opt=paths=source_relative \
-	--grpc-gateway_out=./protos/gen/sso/sso_auth --grpc-gateway_opt=paths=source_relative \
+	protoc -I ./protos/proto --go_out=./protos/gen --go_opt=paths=source_relative \
+	--go-grpc_out=./protos/gen --go-grpc_opt=paths=source_relative \
+	--grpc-gateway_out=./protos/gen --grpc-gateway_opt=paths=source_relative \
 	./protos/proto/sso_service/sso_auth.proto
 
 # default 

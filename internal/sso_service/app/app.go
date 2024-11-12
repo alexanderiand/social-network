@@ -55,8 +55,8 @@ func Run(
 	info := fmt.Sprintf("The %s@v%s is running on: %s:%s",
 		lcfg.Name,
 		lcfg.Version,
-		lcfg.Host,
-		lcfg.Port,
+		lcfg.HTTP.Host,
+		lcfg.HTTP.Port,
 	)
 	slog.Info(info)
 

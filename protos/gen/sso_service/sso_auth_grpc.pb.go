@@ -4,7 +4,7 @@
 // - protoc             v3.21.12
 // source: sso_service/sso_auth.proto
 
-package gen
+package ssoauthpb
 
 import (
 	context "context"
@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SSOAuthService_SignUp_FullMethodName       = "/social_network.proto.sso.auth.SSOAuthService/SignUp"
-	SSOAuthService_SignIn_FullMethodName       = "/social_network.proto.sso.auth.SSOAuthService/SignIn"
-	SSOAuthService_SignOut_FullMethodName      = "/social_network.proto.sso.auth.SSOAuthService/SignOut"
-	SSOAuthService_RefreshToken_FullMethodName = "/social_network.proto.sso.auth.SSOAuthService/RefreshToken"
+	SSOAuthService_SignUp_FullMethodName       = "/social_network.proto.sso.auth.v1.SSOAuthService/SignUp"
+	SSOAuthService_SignIn_FullMethodName       = "/social_network.proto.sso.auth.v1.SSOAuthService/SignIn"
+	SSOAuthService_SignOut_FullMethodName      = "/social_network.proto.sso.auth.v1.SSOAuthService/SignOut"
+	SSOAuthService_RefreshToken_FullMethodName = "/social_network.proto.sso.auth.v1.SSOAuthService/RefreshToken"
 )
 
 // SSOAuthServiceClient is the client API for SSOAuthService service.
@@ -202,7 +202,7 @@ func _SSOAuthService_RefreshToken_Handler(srv interface{}, ctx context.Context, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var SSOAuthService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "social_network.proto.sso.auth.SSOAuthService",
+	ServiceName: "social_network.proto.sso.auth.v1.SSOAuthService",
 	HandlerType: (*SSOAuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

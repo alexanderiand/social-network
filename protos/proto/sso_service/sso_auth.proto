@@ -4,9 +4,9 @@ import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 
 
-package social_network.proto.sso.auth;
+package social_network.proto.sso.auth.v1;
 
-option go_package = "social-network/protos/gen";
+option go_package = "social-network/protos/gen;ssoauthpb";
 
 
 // SignUp 
