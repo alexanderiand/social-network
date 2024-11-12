@@ -8,7 +8,7 @@
         date_of_birth timestamp not null,
         avatar text, -- optional
         nickname varchar(64), -- optional
-        about_me text varchar(255),
+        about_me varchar(255),
         password_hash text not null,
         groups_ids bigint[], 
         groupchat_ids bigint[],
@@ -31,8 +31,8 @@
         user_id bigint not null references users(id),
         user_info text, 
         is_private_profile boolean default false,
-        following bigint[],
-        followers bigint[] 
+        following_ids bigint[],
+        followers_ids bigint[] 
     );
     
 -- +goose StatementEnd
