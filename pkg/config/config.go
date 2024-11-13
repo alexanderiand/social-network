@@ -34,11 +34,11 @@ var (
 
 type (
 	Config struct {
-		Env         string `yaml:"env"`
-		*Service    `yaml:"service"`
-		*HTTPServer `yaml:"http_server"`
-		*Cache
-		*Database
+		Env        string `yaml:"env"`
+		Service    `yaml:"service"`
+		HTTPServer `yaml:"http_server"`
+		Cache
+		Database
 	}
 
 	Service struct {
@@ -82,14 +82,10 @@ func InitConfig() (*Config, error) {
 		return nil, err
 	}
 
-	Config := &Config{
-		Cache:    &Cache{},
-		Database: &Database{},
-	}
-
-	if err := cleanenv.ReadConfig(cfgFilePath, Config); err != nil {
+	cfg := &Config{}
+	if err := cleanenv.ReadConfig(cfgFilePath, cfg); err != nil {
 		return nil, err
 	}
 
-	return Config, nil
+	return cfg, nil
 }

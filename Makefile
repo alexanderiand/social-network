@@ -29,6 +29,9 @@ dc_create_network:
 
 dc_up:
 	docker compose up -d
+	
+dc_down:
+	docker compose down
 
 # default 
-.DEFAULT_GOAL := dc_up
+.DEFAULT_GOAL := run

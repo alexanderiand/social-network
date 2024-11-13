@@ -1,7 +1,6 @@
 FROM golang
 # base image for creatign our a new image
 
-# всё оке
 LABEL platform social_network 
 LABEL author Loid Forger  
 
