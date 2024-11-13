@@ -2,7 +2,6 @@
 -- +goose StatementBegin
 
 -- CONTENT SERVICE TABLES
-START TRANSACTION;
 CREATE TABLE IF NOT EXISTS categories (
     id bigserial primary key not null,
     title varchar(255) not null,
@@ -39,8 +38,6 @@ CREATE TABLE IF NOT EXISTS comments (
     created_at timestamptz not null default current_timestamp,
     updated_at timestamptz not null default current_timestamp
 );
-
-COMMIT;
 -- +goose StatementEnd
 
 -- +goose Down

@@ -2,18 +2,12 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS events (
     id uuid primary key not null,
-    event_maker_username varchar(255),
-    event_maker_id bigint,
-    event_dest_user_id bigint,
-    is_req_to_flw boolean,
-    flw_user_id bigint,
-    is_group_join_invite boolean,
-    inv_group_id bigint,
-    is_group_join_request boolean,
-    group_id bigint,
-    is_group_event boolean,
-    event_id uuid,
-    ev_group_id bigint
+    event_type varchar(64) not null check(event_type in ('req_to_flw', 'group_join_invite', 'group_join_req', 'group_event')),
+    payload json not null,
+    status varchar(30) not null check(status in ('new', 'processing', 'done')),
+    reserved_at timestamptz not null default current_timestamp,
+    created_at timestamptz not null default current_timestamp,
+    updated_at timestamptz not null default current_timestamp
 );
 
 -- +goose StatementEnd

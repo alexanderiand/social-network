@@ -58,10 +58,9 @@ message SignUpRequest {
 }
 
 message SignUpResponse {
-    int64 StatusCode = 1;
-    string StatusText = 2;
-    string JWTAccessToken = 3;
-    string JWTRefreshToken = 4;
+    string JWTAccessToken = 1;
+    string JWTRefreshToken = 2;
+    string SessionID = 3;
 }
 
 // SignIn
@@ -73,10 +72,9 @@ message SignInRequest {
 }
 
 message SignInResponse {
-    int64 StatusCode = 1;
-    string StatusText = 2;
-    string JWTAccessToken = 3;
-    string JWTRefreshToken = 4;
+    string JWTAccessToken = 1;
+    string JWTRefreshToken = 2;
+    string SessionID = 3;
 }
 
 // SignOut
@@ -85,8 +83,7 @@ message SignOutRequest {
 }
 
 message SignOutResponse {
-    int64 StatusCode = 1;
-    string StatusText = 2;
+    string StatusText = 1;
 }
 
 // RefreshToken
@@ -98,4 +95,5 @@ message RefreshTokenRequest {
 message RefreshTokenResponse {
     optional int64 UserID = 1;
     string JWTAccessToken = 2;
+    string SessionID = 3;
 }

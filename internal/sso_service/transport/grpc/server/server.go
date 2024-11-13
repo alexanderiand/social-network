@@ -14,7 +14,9 @@ import (
 	"google.golang.org/grpc/internal/status"
 
 	"social-network/internal/sso_service/app/config"
+	grpccontroller "social-network/internal/sso_service/transport/grpc/controller"
 	grpcmiddleware "social-network/internal/sso_service/transport/grpc/middleware"
+	ssoauthcontroller "social-network/internal/sso_service/transport/http/rest/controller"
 	"social-network/internal/sso_service/transport/http/rest/middleware"
 	gconfig "social-network/pkg/config"
 )
@@ -36,7 +38,8 @@ type GRPCServer struct {
 func New(
 	ctx context.Context,
 	gcfg *gconfig.Config, 
-	lcfg *config.Config, 
+	lcfg *config.Config,
+	authsrv grpccontroller.SSOAuthUseCase,
 	log *slog.Logger,
 	) (
 		*GRPCServer,
@@ -69,6 +72,7 @@ func New(
 
 	// TODO: Register gRPC Services SSO Service (Auth, Permission, Information)
 	// controller.AuthService.Register(grpcServer, authService)
+	grpccontroller.RegisterSSOAuth(grpcServer, authsrv)
 
 	return &GRPCServer{
 		Server: grpcServer,

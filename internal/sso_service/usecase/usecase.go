@@ -1,4 +1,4 @@
-package usecase
+package ssousecase
 
 // SSORepository is the main SSO Service Repository
 type SSORepository interface {

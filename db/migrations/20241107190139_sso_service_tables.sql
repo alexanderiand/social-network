@@ -41,7 +41,10 @@ CREATE TABLE IF NOT EXISTS profiles (
     is_private boolean default false,
     followings_ids bigint[],
     followers_ids bigint[],
-    profile_posts bigint[]
+    profile_posts_ids bigint[],
+    created_at timestamptz not null default current_timestamp,
+    updated_at timestamptz not null default current_timestamp
+
 );
 
 -- +goose StatementEnd

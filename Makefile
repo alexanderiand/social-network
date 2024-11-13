@@ -33,6 +33,18 @@ dc_up:
 dc_down:
 	docker compose down
 
+goose_up:
+	goose -dir ./db/migrations postgres \
+	"postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DBNAME}?sslmode=${POSTGRES_SSLMODE}" up
+
+goose_down:
+	goose -dir ./db/migrations postgres \
+	"postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DBNAME}?sslmode=${POSTGRES_SSLMODE}" down
+
+goose_status:
+	goose -dir ./db/migrations postgres \
+	"postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DBNAME}?sslmode=${POSTGRES_SSLMODE}" status
+
 proto_install:
 	apt update && apt install -y protobuf-compiler \
 	go install google.golang.org/protobuf/cmd/protoc-gen-go@latest \
