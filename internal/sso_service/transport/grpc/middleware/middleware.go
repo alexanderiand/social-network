@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-var RequestID = "RequestID"
+const RequestID = "RequestID"
 
 // unary interceptors
 
@@ -31,8 +31,20 @@ func RequestIDUnaryInterceptor(
 		slog.Warn(err.Error())
 		return nil, err
 	}
+	reqID := reqUUID.String()
 
-	ctx = metadata.AppendToOutgoingContext(ctx, RequestID, reqUUID.String())
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		md = metadata.New(nil)
+	}
+
+	if ids := md[RequestID]; len(ids) > 0 {
+		reqID = ids[0]
+	} else {
+		md.Set(RequestID, reqID)
+	}
+
+	ctx = metadata.NewIncomingContext(ctx, md)
 
 	return handler(ctx, req)
 }
@@ -56,7 +68,7 @@ func LoggingUnaryInterceptor(
 
 	reqTime := time.Now()
 	binfo := fmt.Sprintf("req_time: %s, req_id: %s, method: %s",
-		time.Now().Format(reqTime.Format(time.DateTime)),
+		reqTime.Format(time.DateTime),
 		reqID,
 		info.FullMethod,
 	)
@@ -79,6 +91,34 @@ func LoggingUnaryInterceptor(
 // AuthMiddlewareUnary
 
 // stream interceptors
+func RequestIDStreamInterceptor(
+	srv interface{},
+	ss grpc.ServerStream,
+	info *grpc.StreamServerInfo,
+	handler grpc.StreamHandler) error {
+
+	reqUUID, err := uuid.NewRandom()
+	if err != nil {
+		slog.Warn(err.Error())
+		return err
+	}
+
+	md, ok := metadata.FromIncomingContext(ss.Context())
+	if !ok {
+		md = metadata.New(nil)
+	}
+	reqID := reqUUID.String()
+
+	if ids := md[RequestID]; len(ids) > 0 {
+		reqID = ids[0]
+	} else {
+		md.Set(RequestID, reqID)
+	}
+
+	_ = metadata.NewIncomingContext(ss.Context(), md)
+
+	return nil
+}
 
 // RequestIDSteamInterceptor
 

@@ -50,11 +50,16 @@ message SignUpRequest {
     string LastName = 2;
     google.protobuf.Timestamp DataOfBrith = 3;
     string Email = 4;
-    bytes Avatar = 5;
+    ImageChunk Avatar = 5;
     optional string FileType = 6;
     optional string NickName = 7;
     optional string AboutMe = 8;
     string Password = 9;
+}
+
+message ImageChunk {
+    string FileName = 1;
+    bytes content = 2;
 }
 
 message SignUpResponse {

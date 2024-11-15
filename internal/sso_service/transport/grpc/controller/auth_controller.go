@@ -28,7 +28,7 @@ func RegisterSSOAuth(gRPCServer *grpc.Server, authsrv SSOAuthUseCase) {
 }
 
 // New create a new SSOAuthService, return *SSOAuthService
-func NewSSOAuthService(aus SSOAuthUseCase) *SSOAuthController {
+func NewSSOAuthController(aus SSOAuthUseCase) *SSOAuthController {
 	return &SSOAuthController{usecase: aus}
 }
 
