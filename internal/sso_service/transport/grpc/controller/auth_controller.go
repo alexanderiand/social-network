@@ -12,37 +12,35 @@ import (
 
 type SSOAuthUseCase interface {
 	SignUp(ctx context.Context, user *ssoentity.User) (userID int, err error)
-	SignIn(ctx context.Context, ss *ssoentity.Session, token *ssoentity.JWTToken) error
-	SignOut(ctx context.Context, ss *ssoentity.Session, token *ssoentity.JWTToken) error 
-	RefreshToken(ctx context.Context, ss *ssoentity.Session, token *ssoentity.JWTToken) error 
+	SignIn(ctx context.Context, user *ssoentity.User, ss *ssoentity.Session, token *ssoentity.JWTToken) error
+	SignOut(ctx context.Context, userID int, ss *ssoentity.Session, token *ssoentity.JWTToken) error
+	RefreshToken(ctx context.Context, ss *ssoentity.Session, token *ssoentity.JWTToken) error
 }
 
 // SSOAuthService controller
-type SSOAuthService struct {
+type SSOAuthController struct {
 	usecase SSOAuthUseCase
 	ssoauthpb.UnimplementedSSOAuthServiceServer
 }
 
-// New create a new SSOAuthService instance, return *SSOAuthService
-func NewSSOAuthService(uc SSOAuthUseCase) *SSOAuthService {
-	return &SSOAuthService{
-		usecase: uc,
-	}
+func RegisterSSOAuth(gRPCServer *grpc.Server, authsrv SSOAuthUseCase) {
+	ssoauthpb.RegisterSSOAuthServiceServer(gRPCServer, &SSOAuthController{usecase: authsrv})
 }
 
-func RegisterSSOAuth(gRPCServer *grpc.Server, authsrv SSOAuthUseCase) {
-	ssoauthpb.RegisterSSOAuthServiceServer(gRPCServer, &SSOAuthService{usecase: authsrv})
+// New create a new SSOAuthService, return *SSOAuthService
+func NewSSOAuthService(aus SSOAuthUseCase) *SSOAuthController {
+	return &SSOAuthController{usecase: aus}
 }
 
 // SignUp
-func (a *SSOAuthService) SignUp(clstream grpc.ClientStreamingServer[ssoauthpb.SignUpRequest, ssoauthpb.SignUpResponse]) error {
+func (a *SSOAuthController) SignUp(clstream grpc.ClientStreamingServer[ssoauthpb.SignUpRequest, ssoauthpb.SignUpResponse]) error {
 	slog.Error("SignUp: Implement me")
 
 	return nil
 }
 
 // SignIn
-func (a *SSOAuthService) SignIn(
+func (a *SSOAuthController) SignIn(
 	ctx context.Context,
 	in *ssoauthpb.SignInRequest,
 ) (*ssoauthpb.SignInResponse, error) {
@@ -53,7 +51,7 @@ func (a *SSOAuthService) SignIn(
 }
 
 // SignOut
-func (a *SSOAuthService) SignOut(
+func (a *SSOAuthController) SignOut(
 	ctx context.Context,
 	in *ssoauthpb.SignOutRequest,
 ) (*ssoauthpb.SignOutResponse, error) {
@@ -64,7 +62,7 @@ func (a *SSOAuthService) SignOut(
 }
 
 // RefreshToken
-func (a *SSOAuthService) RefreshToken(
+func (a *SSOAuthController) RefreshToken(
 	ctx context.Context,
 	in *ssoauthpb.RefreshTokenRequest,
 ) (*ssoauthpb.RefreshTokenResponse, error) {

@@ -7,6 +7,7 @@ type SSORepository interface {
 
 // Main SSO Service UseCase
 type UseCase struct {
+	SSOAuthUseCase
 	SSORepository // Dependency Injection
 }
 

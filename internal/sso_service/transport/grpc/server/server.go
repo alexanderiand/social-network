@@ -11,13 +11,11 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/internal/status"
+	"google.golang.org/grpc/status"
 
 	"social-network/internal/sso_service/app/config"
 	grpccontroller "social-network/internal/sso_service/transport/grpc/controller"
 	grpcmiddleware "social-network/internal/sso_service/transport/grpc/middleware"
-	ssoauthcontroller "social-network/internal/sso_service/transport/http/rest/controller"
-	"social-network/internal/sso_service/transport/http/rest/middleware"
 	gconfig "social-network/pkg/config"
 )
 
@@ -28,27 +26,27 @@ var (
 // GRPCServer
 type GRPCServer struct {
 	*grpc.Server
-	log *slog.Logger
-	Host string
-	Port string
+	log      *slog.Logger
+	Host     string
+	Port     string
 	Timeouts time.Duration
 }
 
 // New create a new GRPCServer instance *GRPCServer
 func New(
 	ctx context.Context,
-	gcfg *gconfig.Config, 
+	gcfg *gconfig.Config,
 	lcfg *config.Config,
 	authsrv grpccontroller.SSOAuthUseCase,
 	log *slog.Logger,
-	) (
-		*GRPCServer,
-		error,
-	) {
+) (
+	*GRPCServer,
+	error,
+) {
 	fn := "transport.grpc.server.New"
-	
+
 	if ctx == nil || gcfg == nil || lcfg == nil || log == nil {
-		return nil, fmt.Errorf("%s %w", fn, ErrNilStructPointer) 
+		return nil, fmt.Errorf("%s %w", fn, ErrNilStructPointer)
 	}
 
 	// recovery options
@@ -70,15 +68,15 @@ func New(
 	),
 	)
 
-	// TODO: Register gRPC Services SSO Service (Auth, Permission, Information)
 	// controller.AuthService.Register(grpcServer, authService)
 	grpccontroller.RegisterSSOAuth(grpcServer, authsrv)
+	// TODO: register permission and info controller - services also
 
 	return &GRPCServer{
-		Server: grpcServer,
-		log:    log,
-		Host: lcfg.GRPC.Host,
-		Port: lcfg.GRPC.Port,
+		Server:   grpcServer,
+		log:      log,
+		Host:     lcfg.GRPC.Host,
+		Port:     lcfg.GRPC.Port,
 		Timeouts: gcfg.IdleTimeout,
 	}, nil
 }
@@ -87,19 +85,18 @@ func New(
 func (g *GRPCServer) Run() error {
 	src := "ssosrv.transport.grpc.server.Run"
 	lis, err := net.Listen("tcp", net.JoinHostPort(g.Host, g.Port))
-	if  err != nil {
-		return fmt.Errorf("%s %w", src, err) 
+	if err != nil {
+		return fmt.Errorf("%s %w", src, err)
 	}
 
 	g.log.Info("gRPC server started", "on", net.JoinHostPort(g.Host, g.Port))
 
-	if err := g.Serve(lis);  err != nil {
+	if err := g.Serve(lis); err != nil {
 		return fmt.Errorf("%s %w", src, err)
 	}
 
 	return nil
 }
-
 
 // Stop gRPC server
 func (g *GRPCServer) Stop() {
